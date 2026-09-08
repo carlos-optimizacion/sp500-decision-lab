@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sp500-decision-lab"
+version = "0.2.0"
+description = "Laboratorio educativo de decisión cuantitativa para el S&P 500"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]
+
+[tool.coverage.run]
+branch = true
+source = ["data", "models", "decision", "backtesting"]
+
+[tool.setuptools]
+packages = [
+  "core",
+  "app", "app.pages", "app.components", "app.charts",
+  "data", "data.providers", "data.ingestion", "data.validation", "data.features",
+  "models", "models.kalman", "models.hmm", "models.egarch", "models.change_point",
+  "decision", "backtesting", "learning"
+]
+

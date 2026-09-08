@@ -1,0 +1,10 @@
+# Persistencia local opcional
+duckdb>=1.1,<2
+pyarrow>=17,<25
+
+# Librerias de comparacion para futuras extensiones
+arch>=7,<9
+hmmlearn>=0.3,<1
+ruptures>=1.1,<2
+filterpy>=1.4,<2
+statsmodels>=0.14,<1

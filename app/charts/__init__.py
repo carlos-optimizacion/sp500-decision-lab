@@ -1,0 +1,2 @@
+"""Gráficos Plotly del dashboard."""
+

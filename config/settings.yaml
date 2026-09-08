@@ -1,0 +1,100 @@
+project:
+  name: "S&P 500 Decision Lab"
+  version: "0.2.0"
+  timezone: "America/New_York"
+  seed: 42
+
+data:
+  start_date: "2014-01-01"
+  end_date: null
+  market_symbol: "SPY"
+  benchmark_symbol: "SPY"
+  reference_symbol: "^GSPC"
+  refresh_hours: 24
+  request_timeout_seconds: 45
+  min_market_rows: 1000
+  freshness_warning_days: 7
+  macro_vintage_mode: "release_lag_proxy"
+  sources:
+    spy: "Yahoo Finance chart API"
+    spx: "Yahoo Finance chart API"
+    vix: "Cboe Global Markets"
+    macro: "Federal Reserve Economic Data (FRED)"
+  fred:
+    fed_funds: {series: "DFF", lag_business_days: 1}
+    treasury_2y: {series: "DGS2", lag_business_days: 1}
+    treasury_10y: {series: "DGS10", lag_business_days: 1}
+    cpi: {series: "CPIAUCSL", lag_business_days: 35}
+    unemployment: {series: "UNRATE", lag_business_days: 7}
+    dollar_index: {series: "DTWEXBGS", lag_business_days: 1}
+    wti: {series: "DCOILWTICO", lag_business_days: 1}
+    credit_spread: {series: "BAMLH0A0HYM2", lag_business_days: 1}
+
+features:
+  moving_averages: [20, 50, 200]
+  return_windows: [1, 5, 20, 60]
+  volatility_windows: [20, 60]
+  percentile_window: 756
+  percentile_min_periods: 126
+
+models:
+  kalman:
+    process_level: 0.000002
+    process_trend: 0.00000002
+    measurement_noise: 0.00012
+    initial_covariance: 0.05
+  hmm:
+    states: 4
+    iterations: 80
+    tolerance: 0.0001
+    covariance_floor: 0.0001
+    transition_prior: 6.0
+    features:
+      - return_1d
+      - volatility_20d
+      - vix_z_252d
+      - kalman_slope_20d
+      - yield_spread_z_252d
+      - credit_spread_z_252d
+  egarch:
+    iterations: 250
+    min_train_observations: 500
+  change_point:
+    recent_window: 20
+    baseline_window: 80
+    min_segment: 40
+    max_breaks: 12
+
+decision:
+  opportunity_weights:
+    trend: 0.30
+    momentum: 0.20
+    regime: 0.20
+    inverse_risk: 0.15
+    macro: 0.10
+    drawdown_value: 0.05
+  risk_weights:
+    egarch: 0.30
+    vix: 0.25
+    drawdown: 0.15
+    change: 0.15
+    regime: 0.15
+  confidence_weights:
+    kalman: 0.30
+    regime: 0.20
+    structural_stability: 0.15
+    model_stability: 0.10
+    data_quality: 0.15
+    walk_forward: 0.10
+  minimum_strong_confidence: 60
+  maximum_risk_for_exposure: 80
+  low_confidence_exposure_cap: 0.25
+  thresholds: [40, 60, 80]
+  exposure_levels: [0.0, 0.25, 0.65, 1.0]
+
+backtest:
+  transaction_cost_bps: 0
+  annual_periods: 252
+  train_start: "2016-01-01"
+  first_test_year: 2020
+  rolling_train_years: null

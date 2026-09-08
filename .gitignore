@@ -1,0 +1,19 @@
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+.env
+*.log
+logs/
+
+# Datos descargados y artefactos derivados. El repositorio publico los
+# reconstruye desde las fuentes originales durante el primer arranque.
+data/raw/*
+data/processed/*
+data/features/*.csv
+data/features/*.parquet
+database/
