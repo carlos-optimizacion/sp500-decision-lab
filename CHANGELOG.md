@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 — 2026-09-09
+
+- Tema oscuro uniforme en la aplicación, tarjetas y gráficos.
+- Navegación simplificada mediante el selector de ventana `1M`–`10Y`.
+- Eliminación del zoom, desplazamiento y barra flotante de Plotly.
+
 ## 0.3.0 — 2026-09-09
 
 - Pronóstico probabilístico experimental para la próxima sesión.

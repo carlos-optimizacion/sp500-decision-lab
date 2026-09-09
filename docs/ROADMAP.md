@@ -17,8 +17,9 @@
 - Comparación contra referencias direccional y de retorno cero.
 - Intervalo predictivo del 80% con volatilidad EGARCH `t+1`.
 - Estado explícito cuando no se demuestra ventaja predictiva.
-- Zoom y desplazamiento en series temporales.
+- Navegación temporal simplificada mediante ventanas de `1M` a `10Y`.
 - Velas OHLC ajustadas como vista opcional.
+- Tema oscuro uniforme para la aplicación y los gráficos.
 
 ## Siguiente iteración recomendada
 

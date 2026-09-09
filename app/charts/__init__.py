@@ -1,16 +1,11 @@
-"""Gráficos Plotly del dashboard."""
+"""Configuración común de los gráficos Plotly del dashboard."""
 
-INTERACTIVE_PLOT_CONFIG = {
-    "displayModeBar": True,
-    "displaylogo": False,
-    "scrollZoom": True,
-    "responsive": True,
-    "modeBarButtonsToRemove": ["lasso2d", "select2d"],
-}
-
-STATIC_PLOT_CONFIG = {
+PLOT_CONFIG = {
     "displayModeBar": False,
+    "displaylogo": False,
+    "scrollZoom": False,
+    "doubleClick": False,
     "responsive": True,
 }
 
-__all__ = ["INTERACTIVE_PLOT_CONFIG", "STATIC_PLOT_CONFIG"]
+__all__ = ["PLOT_CONFIG"]

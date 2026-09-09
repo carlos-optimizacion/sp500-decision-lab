@@ -38,7 +38,7 @@ La primera baseline ofrece una reducción material del drawdown y de la volatili
 - ChangeRisk causal y segmentación binaria offline para diagnóstico.
 - Decision Engine explicable, backtesting, costos configurables y walk-forward anual.
 - Pronóstico probabilístico a una sesión con modelo direccional regularizado, retorno esperado e intervalo EGARCH.
-- Dashboard Streamlit con cinco vistas, zoom, velas opcionales y análisis de ablación.
+- Dashboard Streamlit oscuro con cinco vistas, ventanas temporales, velas opcionales y análisis de ablación.
 - Pruebas automatizadas de cálculos y ausencia de look-ahead.
 
 ## Arquitectura
@@ -95,7 +95,7 @@ Consulta también el [manual simple de usuario](docs/MANUAL_USUARIO.md).
 
 1. Abre **Estado actual** para ver los tres scores, régimen y explicación.
 2. Lee el bloque **Pronóstico experimental** junto con su estado de validación fuera de muestra.
-3. Elige `Línea` o `Velas`; usa la rueda del mouse o la barra Plotly para acercar y desplazar.
+3. Elige `Línea` o `Velas`; controla el período desde `Ventana visual` en la barra lateral.
 4. Cambia la ventana entre `1M` y `10Y` en la barra lateral.
 5. Usa **Backtesting** para comparar con Buy & Hold y simular costos.
 6. En **Modelos**, desactiva componentes y observa el análisis de ablación.

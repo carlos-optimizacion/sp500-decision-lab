@@ -41,15 +41,7 @@ Lee siempre el mensaje de validación. Si aparece **Sin ventaja predictiva compr
 
 La vista inicial es **Línea**. Selecciona **Velas** cuando quieras ver apertura, máximo, mínimo y cierre ajustados de cada sesión.
 
-En la barra del gráfico puedes:
-
-- acercar o alejar;
-- desplazar el período visible;
-- ajustar automáticamente los ejes;
-- restaurar la vista inicial;
-- descargar una imagen del gráfico.
-
-La ventana lateral permite elegir desde `1M` hasta `10Y` y activar la escala logarítmica.
+La navegación se mantiene deliberadamente sencilla: usa **Ventana visual** en la barra lateral para elegir `1M`, `3M`, `6M`, `1Y`, `3Y`, `5Y` o `10Y`. También puedes activar la escala logarítmica. El gráfico no utiliza zoom ni desplazamiento manual.
 
 ## Backtesting
 

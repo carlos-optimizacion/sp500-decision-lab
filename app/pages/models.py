@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from app.charts import INTERACTIVE_PLOT_CONFIG
+from app.charts import PLOT_CONFIG
 from app.charts.figures import change_risk_figure, kalman_figure, regime_history_figure, volatility_figure
 from app.components import hero, state_card
 from backtesting.engine import run_backtest
@@ -81,7 +81,7 @@ def render(bundle: AnalysisBundle, range_key: str, transaction_cost_bps: float) 
         col1.metric("Confianza Kalman", f"{current['kalman_confidence']:.1f}%")
         col2.metric("NIS", f"{current['kalman_nis']:.2f}")
         col3.metric("Innovación", f"{current['kalman_innovation']:.4f}")
-        st.plotly_chart(kalman_figure(bundle.model_frame, range_key), width="stretch", config=INTERACTIVE_PLOT_CONFIG)
+        st.plotly_chart(kalman_figure(bundle.model_frame, range_key), width="stretch", config=PLOT_CONFIG)
         st.markdown(
             "El filtro lineal estima nivel y pendiente del log-precio. UKF queda deliberadamente fuera de esta iteración: solo se incorporará si mejora esta referencia simple fuera de muestra."
         )
@@ -90,14 +90,14 @@ def render(bundle: AnalysisBundle, range_key: str, transaction_cost_bps: float) 
         columns = st.columns(4)
         for column, name in zip(columns, ("Bull", "Neutral", "Correction", "Stress")):
             column.metric(name, f"{100 * current[f'regime_{name}']:.1f}%")
-        st.plotly_chart(regime_history_figure(bundle.model_frame, range_key), width="stretch", config=INTERACTIVE_PLOT_CONFIG)
+        st.plotly_chart(regime_history_figure(bundle.model_frame, range_key), width="stretch", config=PLOT_CONFIG)
         st.caption("Los colores diferencian categorías; las cuatro áreas suman 100% cada día.")
     with egarch_tab:
         current = bundle.model_frame.dropna(subset=["egarch_volatility_forecast"]).iloc[-1]
         col1, col2 = st.columns(2)
         col1.metric("Volatilidad EGARCH t+1", f"{current['egarch_volatility_forecast']:.1%}")
         col2.metric("Percentil histórico", f"{current['egarch_volatility_percentile']:.1f}")
-        st.plotly_chart(volatility_figure(bundle.model_frame, range_key), width="stretch", config=INTERACTIVE_PLOT_CONFIG)
+        st.plotly_chart(volatility_figure(bundle.model_frame, range_key), width="stretch", config=PLOT_CONFIG)
         st.caption("La volatilidad de t se pronostica con shocks observados hasta t−1; el retorno de t actualiza recién el pronóstico siguiente.")
     with change_tab:
         current = bundle.model_frame.dropna(subset=["change_risk"]).iloc[-1]
@@ -105,7 +105,7 @@ def render(bundle: AnalysisBundle, range_key: str, transaction_cost_bps: float) 
         col1.metric("ChangeRisk", f"{current['change_risk']:.1f}")
         col2.metric("Cambio de media", f"{current['change_mean_shift']:.2f} σ")
         col3.metric("Cambio de volatilidad", f"{current['change_volatility_shift']:.2f}")
-        st.plotly_chart(change_risk_figure(bundle.model_frame, range_key), width="stretch", config=INTERACTIVE_PLOT_CONFIG)
+        st.plotly_chart(change_risk_figure(bundle.model_frame, range_key), width="stretch", config=PLOT_CONFIG)
         st.caption("Este indicador causal alimenta el score. La segmentación binaria/PELT offline se reserva para diagnóstico visual y nunca alimenta retornos pasados.")
         with st.expander("Exploración retrospectiva PELT / Binary Segmentation"):
             method_label = st.selectbox("Método offline", ["PELT", "Binary Segmentation"])

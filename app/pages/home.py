@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from app.charts import INTERACTIVE_PLOT_CONFIG, STATIC_PLOT_CONFIG
+from app.charts import PLOT_CONFIG
 from app.charts.figures import conditions_figure, market_history_figure, regime_probability_figure, score_gauge
 from app.components import hero, soft_card, state_card
 from core.analysis import AnalysisBundle
@@ -96,7 +96,7 @@ def render(bundle: AnalysisBundle, range_key: str, log_scale: bool) -> None:
 
     left, middle, right = st.columns([1.35, 1, 1])
     with left:
-        st.plotly_chart(score_gauge(float(latest["opportunity_score"])), width="stretch", config=STATIC_PLOT_CONFIG)
+        st.plotly_chart(score_gauge(float(latest["opportunity_score"])), width="stretch", config=PLOT_CONFIG)
     with middle:
         soft_card("Risk Score", f"{latest['risk_score']:.1f} / 100", "100 indica mayor presión de riesgo.")
         st.write("")
@@ -117,18 +117,18 @@ def render(bundle: AnalysisBundle, range_key: str, log_scale: bool) -> None:
     st.plotly_chart(
         market_history_figure(bundle.model_frame, range_key, log_scale=log_scale, price_view=price_view),
         width="stretch",
-        config=INTERACTIVE_PLOT_CONFIG,
+        config=PLOT_CONFIG,
     )
     st.caption(
         "Fuente: SPY ajustado de Yahoo Finance. Cálculos propios EOD; el drawdown se mide desde el máximo acumulado. "
-        "Use la rueda del mouse o la barra del gráfico para acercar, desplazar y restaurar la vista."
+        "Use Ventana visual en la barra lateral para elegir el período mostrado."
     )
 
     left, right = st.columns(2)
     with left:
-        st.plotly_chart(conditions_figure(latest), width="stretch", config=STATIC_PLOT_CONFIG)
+        st.plotly_chart(conditions_figure(latest), width="stretch", config=PLOT_CONFIG)
     with right:
-        st.plotly_chart(regime_probability_figure(latest), width="stretch", config=STATIC_PLOT_CONFIG)
+        st.plotly_chart(regime_probability_figure(latest), width="stretch", config=PLOT_CONFIG)
 
     st.subheader("Control del modelo")
     control_columns = st.columns(5)

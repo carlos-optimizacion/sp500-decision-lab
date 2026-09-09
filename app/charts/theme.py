@@ -1,16 +1,16 @@
-"""Sistema visual sobrio y consistente para todas las figuras."""
+"""Sistema visual oscuro y consistente para todas las figuras."""
 
-INK = "#172033"
-MUTED = "#667085"
-GRID = "#E6EAF0"
-BLUE = "#1F5EFF"
-BLUE_LIGHT = "#AFC6FF"
-GOLD = "#D6A84B"
-ORANGE = "#E57A44"
-PINK = "#C65C8A"
-OLIVE = "#7C8A4B"
-WHITE = "#FFFFFF"
-PALE = "#F6F7FB"
+INK = "#E5E7EB"
+MUTED = "#94A3B8"
+GRID = "#293548"
+AXIS = "#475569"
+BLUE = "#5B8CFF"
+BLUE_LIGHT = "#91B4FF"
+GOLD = "#E6B85C"
+ORANGE = "#FF8A5B"
+PINK = "#E879B0"
+OLIVE = "#A3B86C"
+PANEL = "#111827"
 
 REGIME_COLORS = {
     "Bull": BLUE,
@@ -27,11 +27,12 @@ def layout(title: str, subtitle: str = "", height: int = 420) -> dict:
     return {
         "title": {"text": title_text, "x": 0.01, "xanchor": "left", "font": {"size": 16, "color": INK}},
         "height": height,
-        "paper_bgcolor": WHITE,
-        "plot_bgcolor": WHITE,
+        "paper_bgcolor": PANEL,
+        "plot_bgcolor": PANEL,
         "font": {"family": "Inter, Arial, sans-serif", "color": INK, "size": 12},
         "margin": {"l": 54, "r": 28, "t": 76, "b": 48},
         "hovermode": "x unified",
+        "dragmode": False,
         "legend": {"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1},
     }
 
@@ -43,10 +44,9 @@ def axis(title: str = "", percent: bool = False) -> dict:
         "gridcolor": GRID,
         "zeroline": False,
         "showline": True,
-        "linecolor": "#CBD1DB",
-        "fixedrange": False,
+        "linecolor": AXIS,
+        "fixedrange": True,
     }
     if percent:
         output["tickformat"] = ".0%"
     return output
-
