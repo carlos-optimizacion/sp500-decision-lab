@@ -91,6 +91,8 @@ Streamlit mostrará normalmente `http://localhost:8501`.
 
 ## Uso rápido
 
+Consulta también el [manual simple de usuario](docs/MANUAL_USUARIO.md).
+
 1. Abre **Estado actual** para ver los tres scores, régimen y explicación.
 2. Lee el bloque **Pronóstico experimental** junto con su estado de validación fuera de muestra.
 3. Elige `Línea` o `Velas`; usa la rueda del mouse o la barra Plotly para acercar y desplazar.
@@ -179,4 +181,4 @@ tests/             Pruebas unitarias e integración
 - El pronóstico diario actual no supera sus referencias simples en la validación 2020–2026 YTD; debe leerse como experimental.
 - No se ha implementado UKF ni TFT: solo se añadirán contra una baseline estable y bajo comparación out-of-sample.
 
-Consulta [Arquitectura](docs/ARCHITECTURE.md), [Metodología](docs/METHODOLOGY.md), [Diccionario de datos](docs/DATA_DICTIONARY.md), [Validación](docs/VALIDATION.md), [Roadmap](docs/ROADMAP.md) y [consideraciones de licencia](docs/DATA_LICENSE.md).
+Consulta el [Manual de usuario](docs/MANUAL_USUARIO.md), [Arquitectura](docs/ARCHITECTURE.md), [Metodología](docs/METHODOLOGY.md), [Diccionario de datos](docs/DATA_DICTIONARY.md), [Validación](docs/VALIDATION.md), [Roadmap](docs/ROADMAP.md) y [consideraciones de licencia](docs/DATA_LICENSE.md).
