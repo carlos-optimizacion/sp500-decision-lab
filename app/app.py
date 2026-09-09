@@ -26,8 +26,14 @@ st.set_page_config(
 )
 
 
+BUNDLE_CACHE_SCHEMA_VERSION = "0.3.0"
+
+
 @st.cache_data(ttl=86_400, show_spinner=False)
-def _load_bundle() -> AnalysisBundle:
+def _load_bundle(cache_schema_version: str) -> AnalysisBundle:
+    """Carga el snapshot con una clave que cambia cuando evoluciona su esquema."""
+
+    del cache_schema_version
     return load_snapshot()
 
 
@@ -35,7 +41,7 @@ def _sidebar(bundle: AnalysisBundle) -> tuple[str, str, bool, float]:
     settings = load_settings()
     with st.sidebar:
         st.markdown("## Decision Lab")
-        st.caption("MVP 2 · Datos EOD · Costo tecnológico US$0")
+        st.caption("MVP 3 · Datos EOD · Costo tecnológico US$0")
         page = st.radio(
             "Navegación",
             ["Estado actual", "Backtesting", "Modelos", "Aprendizaje", "Datos y calidad"],
@@ -73,7 +79,7 @@ def main() -> None:
     inject_style()
     try:
         with st.spinner("Cargando snapshot validado…"):
-            bundle = _load_bundle()
+            bundle = _load_bundle(BUNDLE_CACHE_SCHEMA_VERSION)
     except Exception as exc:
         st.error("No fue posible cargar el snapshot ni actualizar las fuentes.")
         st.exception(exc)
