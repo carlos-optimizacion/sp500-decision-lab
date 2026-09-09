@@ -13,9 +13,10 @@ El MVP usa un monolito modular en Python. Para el volumen actual —unas pocas m
 5. `backtesting.walk_forward` separa train y test por año.
 6. En cada fold, HMM y EGARCH se ajustan solo con train; Kalman y ChangeRisk se calculan recursivamente.
 7. `decision` construye Risk, Opportunity y Confidence.
-8. `backtesting.engine` desplaza exposición una sesión, incorpora turnover/costos y compara con Buy & Hold.
-9. `core.analysis` guarda snapshots, manifiestos, experimento, Parquet y DuckDB.
-10. `app` lee el snapshot y permite explorar sin volver a entrenar en cada interacción.
+8. `forecasting` ajusta modelos regularizados por año, genera pronósticos `t+1` y mide su desempeño contra referencias simples.
+9. `backtesting.engine` desplaza exposición una sesión, incorpora turnover/costos y compara con Buy & Hold.
+10. `core.analysis` guarda snapshots, manifiestos, experimento, Parquet y DuckDB.
+11. `app` lee el snapshot y permite explorar sin volver a entrenar en cada interacción.
 
 ## Contratos entre capas
 
@@ -26,6 +27,7 @@ El MVP usa un monolito modular en Python. Para el volumen actual —unas pocas m
 | Features | Datos hasta `t` | Feature store | Nunca usa valores posteriores |
 | Modelos | Train/test explícitos | Estados y riesgos | Probabilidad filtrada, no suavizada |
 | Decision | Componentes 0–100 | Scores y estado | Confidence <60 bloquea señal fuerte |
+| Forecasting | Features conocidas en `t` | Probabilidad, retorno e intervalo `t+1` | El resultado `t+1` solo evalúa el pronóstico |
 | Backtest | Retorno + exposición | Curvas/métricas | Exposición se desplaza a `t+1` |
 | Dashboard | Snapshot validado | Vistas interactivas | Señala fecha, fuente y caveats |
 
@@ -47,4 +49,3 @@ La interfaz `data.providers` puede sustituirse por un proveedor con WebSocket si
 5. WebSockets solo cuando el caso de uso necesite intradía.
 
 Kafka no se justifica mientras la escala sea una única familia de activos EOD.
-

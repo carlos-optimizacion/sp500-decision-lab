@@ -1,6 +1,6 @@
 project:
   name: "S&P 500 Decision Lab"
-  version: "0.2.0"
+  version: "0.3.0"
   timezone: "America/New_York"
   seed: 42
 
@@ -64,6 +64,28 @@ models:
     baseline_window: 80
     min_segment: 40
     max_breaks: 12
+
+forecast:
+  minimum_train_observations: 500
+  minimum_validation_observations: 500
+  logistic_l2: 0.12
+  ridge_alpha: 30.0
+  interval_level: 0.80
+  negative_probability_threshold: 0.45
+  positive_probability_threshold: 0.55
+  features:
+    - return_1d
+    - return_5d
+    - return_20d
+    - return_60d
+    - volatility_20d
+    - volatility_60d
+    - distance_ma200
+    - ma20_vs_ma50
+    - drawdown
+    - vix_change_5d
+    - vix_percentile
+    - vix_z_252d
 
 decision:
   opportunity_weights:

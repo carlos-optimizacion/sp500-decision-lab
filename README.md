@@ -1,4 +1,4 @@
-# S&P 500 Decision Lab — MVP 2
+# S&P 500 Decision Lab — MVP 3
 
 Aplicación web educativa para estudiar el estado del S&P 500 con datos históricos EOD, modelos matemáticos transparentes y validación fuera de muestra. El sistema combina **Filtro de Kalman, HMM, EGARCH y detección causal de cambios** para producir tres medidas separadas:
 
@@ -8,18 +8,20 @@ Aplicación web educativa para estudiar el estado del S&P 500 con datos históri
 
 La aplicación nunca genera una orden de compra o venta. Sus estados son descriptivos: *Esperar*, *Entrada muy parcial*, *Entrada gradual favorable* y *Condición históricamente muy favorable*.
 
+La vista principal añade un **pronóstico experimental para la próxima sesión**. Informa probabilidad positiva, retorno esperado, intervalo del 80% y volatilidad EGARCH `t+1`; también declara cuando la validación no demuestra ventaja frente a referencias simples.
+
 > Uso educativo y de investigación. No constituye asesoría financiera. El rendimiento pasado no garantiza resultados futuros.
 
 ## Estado del MVP
 
-Referencia validada localmente el **8 de septiembre de 2026** (`experiment_id: 52feaa20b383`). El repositorio público no redistribuye los snapshots de mercado: los descarga de sus fuentes originales y los reconstruye en el primer arranque.
+Referencia validada localmente el **9 de septiembre de 2026** (`experiment_id: 0c75c69c484b`). El repositorio público no redistribuye los snapshots de mercado: los descarga de sus fuentes originales y los reconstruye en el primer arranque.
 
 | Validación out-of-sample 2020–2026 YTD | DecisionLab | Buy & Hold SPY |
 |---|---:|---:|
-| CAGR | 4.18% | 15.52% |
-| Volatilidad anualizada | 6.25% | 20.11% |
-| Sharpe | 0.69 | 0.82 |
-| Sortino | 0.92 | 1.16 |
+| CAGR | 4.45% | 15.40% |
+| Volatilidad anualizada | 6.29% | 20.10% |
+| Sharpe | 0.72 | 0.81 |
+| Sortino | 0.97 | 1.15 |
 | Maximum Drawdown | -10.98% | -33.72% |
 
 La primera baseline ofrece una reducción material del drawdown y de la volatilidad, pero todavía no supera simultáneamente a Buy & Hold en Sharpe, Sortino o CAGR. Este resultado mixto se conserva deliberadamente: los años de prueba no se utilizaron para ajustar pesos o umbrales.
@@ -35,7 +37,8 @@ La primera baseline ofrece una reducción material del drawdown y de la volatili
 - EGARCH(1,1) estimado por máxima verosimilitud.
 - ChangeRisk causal y segmentación binaria offline para diagnóstico.
 - Decision Engine explicable, backtesting, costos configurables y walk-forward anual.
-- Dashboard Streamlit con cinco vistas y análisis de ablación.
+- Pronóstico probabilístico a una sesión con modelo direccional regularizado, retorno esperado e intervalo EGARCH.
+- Dashboard Streamlit con cinco vistas, zoom, velas opcionales y análisis de ablación.
 - Pruebas automatizadas de cálculos y ausencia de look-ahead.
 
 ## Arquitectura
@@ -47,7 +50,7 @@ flowchart TD
     C --> D["Features causales"]
     D --> E["Kalman · HMM · EGARCH · ChangeRisk"]
     E --> F["Opportunity · Risk · Confidence"]
-    F --> G["Backtest t+1"]
+    F --> G["Backtest y pronóstico t+1"]
     G --> H["Walk-forward anual"]
     H --> I["Dashboard Streamlit"]
 ```
@@ -89,11 +92,13 @@ Streamlit mostrará normalmente `http://localhost:8501`.
 ## Uso rápido
 
 1. Abre **Estado actual** para ver los tres scores, régimen y explicación.
-2. Cambia la ventana entre `1M` y `10Y` en la barra lateral.
-3. Usa **Backtesting** para comparar con Buy & Hold y simular costos.
-4. En **Modelos**, desactiva componentes y observa el análisis de ablación.
-5. Revisa **Datos y calidad** antes de interpretar resultados.
-6. Pulsa **Actualizar fuentes** para descargar EOD y volver a estimar todos los folds.
+2. Lee el bloque **Pronóstico experimental** junto con su estado de validación fuera de muestra.
+3. Elige `Línea` o `Velas`; usa la rueda del mouse o la barra Plotly para acercar y desplazar.
+4. Cambia la ventana entre `1M` y `10Y` en la barra lateral.
+5. Usa **Backtesting** para comparar con Buy & Hold y simular costos.
+6. En **Modelos**, desactiva componentes y observa el análisis de ablación.
+7. Revisa **Datos y calidad** antes de interpretar resultados.
+8. Pulsa **Actualizar fuentes** para descargar EOD y volver a estimar todos los folds.
 
 ## Fuentes de datos
 
@@ -145,6 +150,7 @@ config/            Parámetros centralizados
 core/              Orquestación, rutas, logging y persistencia
 data/              Proveedores, ingestión, validación y features
 decision/          Opportunity, Risk, Confidence y explicación
+forecasting/       Pronóstico t+1, intervalos y validación temporal
 models/            Kalman, HMM, EGARCH y Change Point
 database/          DuckDB y copias Parquet locales (no versionados)
 docs/              Arquitectura, metodología, diccionario y validación
@@ -158,6 +164,7 @@ tests/             Pruebas unitarias e integración
 - Rezagos explícitos de publicación para macroeconomía.
 - Probabilidades HMM **filtradas**, no suavizadas con observaciones futuras.
 - EGARCH de prueba ajustado exclusivamente con el train anterior.
+- Pronóstico `t+1` entrenado por año; el retorno siguiente se reserva como resultado y no como variable.
 - Señal del cierre `t` desplazada antes de multiplicarla por el retorno `t+1`.
 - Score walk-forward de cada fold usa solo folds ya finalizados.
 - Pruebas que alteran el futuro y verifican que el pasado no cambie.
@@ -169,6 +176,7 @@ tests/             Pruebas unitarias e integración
 - Los horizontes largos tienen pocas observaciones efectivamente independientes debido al solapamiento.
 - El HMM puede cambiar la interpretación interna de estados entre folds; un mapeo determinista los vuelve a nombrar por retorno y volatilidad del train.
 - La baseline reduce riesgo, pero aún no demuestra superioridad global ajustada por riesgo.
+- El pronóstico diario actual no supera sus referencias simples en la validación 2020–2026 YTD; debe leerse como experimental.
 - No se ha implementado UKF ni TFT: solo se añadirán contra una baseline estable y bajo comparación out-of-sample.
 
 Consulta [Arquitectura](docs/ARCHITECTURE.md), [Metodología](docs/METHODOLOGY.md), [Diccionario de datos](docs/DATA_DICTIONARY.md), [Validación](docs/VALIDATION.md), [Roadmap](docs/ROADMAP.md) y [consideraciones de licencia](docs/DATA_LICENSE.md).

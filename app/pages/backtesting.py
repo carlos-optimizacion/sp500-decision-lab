@@ -5,13 +5,11 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
+from app.charts import INTERACTIVE_PLOT_CONFIG, STATIC_PLOT_CONFIG
 from app.charts.figures import annual_returns_figure, drawdown_figure, equity_figure
 from app.components import hero
 from backtesting.engine import run_backtest
 from core.analysis import AnalysisBundle
-
-
-PLOT_CONFIG = {"displayModeBar": False, "responsive": True}
 
 
 def _fmt_percent(value: float) -> str:
@@ -80,9 +78,9 @@ def render(bundle: AnalysisBundle, transaction_cost_bps: float) -> None:
         st.warning("La configuración actual no mejora el riesgo ajustado ni el drawdown de forma suficiente; debe revisarse antes de considerar una siguiente fase.")
     st.caption(f"Período evaluado: {period} · Datos diarios EOD · Costos configurables: {transaction_cost_bps:.0f} bps.")
 
-    st.plotly_chart(equity_figure(result.daily), width="stretch", config=PLOT_CONFIG, key="equity-main")
-    st.plotly_chart(drawdown_figure(result.daily), width="stretch", config=PLOT_CONFIG, key="drawdown-main")
-    st.plotly_chart(annual_returns_figure(result.annual_returns), width="stretch", config=PLOT_CONFIG, key="annual-main")
+    st.plotly_chart(equity_figure(result.daily), width="stretch", config=INTERACTIVE_PLOT_CONFIG, key="equity-main")
+    st.plotly_chart(drawdown_figure(result.daily), width="stretch", config=INTERACTIVE_PLOT_CONFIG, key="drawdown-main")
+    st.plotly_chart(annual_returns_figure(result.annual_returns), width="stretch", config=STATIC_PLOT_CONFIG, key="annual-main")
 
     st.subheader("Tabla de métricas")
     st.dataframe(_metric_table(strategy, benchmark), width="stretch")
@@ -95,7 +93,7 @@ def render(bundle: AnalysisBundle, transaction_cost_bps: float) -> None:
         st.plotly_chart(equity_figure(detail.assign(
             strategy_equity=(1 + detail["strategy_return"]).cumprod(),
             benchmark_equity=(1 + detail["benchmark_return"]).cumprod(),
-        )), width="stretch", config=PLOT_CONFIG, key="equity-detail")
+        )), width="stretch", config=INTERACTIVE_PLOT_CONFIG, key="equity-detail")
 
     st.subheader("Resultados por fold")
     folds = bundle.fold_metrics.copy()

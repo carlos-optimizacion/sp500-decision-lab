@@ -114,3 +114,11 @@ Si Confidence <60, la exposición máxima queda limitada a 25%.
 ## Frecuencias por horizonte
 
 Los retornos futuros se utilizan únicamente después de seleccionar condiciones históricas similares para describir sus resultados. No alimentan el score. Como las ventanas se solapan, se informa un tamaño efectivo aproximado; horizontes con evidencia escasa deben interpretarse como exploratorios.
+
+## Pronóstico de la próxima sesión
+
+El objetivo se define como el retorno ajustado entre el cierre `t` y el cierre de la siguiente sesión. Un modelo logístico regularizado estima la probabilidad de retorno positivo y una regresión ridge estima el retorno central. Ambos usan retornos, volatilidad, medias móviles, drawdown y VIX disponibles al cierre.
+
+La validación sigue los mismos folds anuales expanding del sistema. Para el test de cada año, los coeficientes se estiman únicamente con observaciones anteriores y se excluye cualquier fila cuyo resultado pertenezca al período de prueba. El pronóstico visible se vuelve a ajustar con todos los resultados conocidos hasta `t`.
+
+EGARCH aporta la volatilidad anualizada de `t+1`. Se transforma a escala diaria y se combina con el retorno central para formar un intervalo predictivo del 80%. La evaluación informa acierto direccional, Brier, error absoluto medio y cobertura del intervalo frente a referencias simples. Si el modelo no mejora esas referencias, la interfaz muestra `Sin ventaja predictiva comprobada`.

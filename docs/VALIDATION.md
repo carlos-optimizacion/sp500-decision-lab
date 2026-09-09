@@ -6,9 +6,9 @@ El MVP es funcional, reproducible y metodológicamente apto para aprendizaje y e
 
 ## Cobertura
 
-- Fecha de corte: 8 de septiembre de 2026.
-- Mercado: 3,189 sesiones, del 2 de enero de 2014 al 8 de septiembre de 2026.
-- Walk-forward: 1,679 sesiones de test, de 2020 a 2026 YTD.
+- Fecha de corte: 9 de septiembre de 2026.
+- Mercado: 3,190 sesiones, del 2 de enero de 2014 al 9 de septiembre de 2026.
+- Walk-forward: 1,680 sesiones de test, de 2020 a 2026 YTD.
 - Folds: siete; HMM y EGARCH convergieron en los siete.
 - Duplicados de fecha: 0.
 - Filas con OHLC faltante: 0.
@@ -35,22 +35,28 @@ Las mayores caídas y subidas diarias del snapshot corresponden a sesiones plaus
 | Splits | `train_end < test_start` en todos los folds |
 | Snapshot integrado | Índices, scores, probabilidades y folds coherentes |
 
-Resultado automatizado: **12 pruebas aprobadas**.
+Resultado automatizado: **16 pruebas aprobadas**.
+
+## Pronóstico de la próxima sesión
+
+La validación reúne 1,679 pronósticos evaluables entre 2020 y 2026 YTD. El acierto direccional es 54.62%, frente a 54.85% de la referencia basada en la frecuencia positiva del train. El Brier del modelo es 0.24999, frente a 0.24813 de referencia, y el MAE del retorno es 0.866%, frente a 0.835% de predecir retorno cero. El intervalo nominal del 80% cubre 79.27% de los resultados.
+
+La cobertura del intervalo está bien calibrada, pero los modelos de dirección y retorno no mejoran sus referencias simples. Por ello la interfaz muestra **Sin ventaja predictiva comprobada** y conserva el resultado como experimento educativo, no como señal operativa.
 
 ## Resultado out-of-sample
 
 | Métrica | DecisionLab | Buy & Hold | Lectura |
 |---|---:|---:|---|
-| CAGR | 4.18% | 15.52% | Inferior |
-| Retorno acumulado | 31.37% | 161.43% | Inferior |
-| Volatilidad | 6.25% | 20.11% | 13.86 pp menor |
-| Sharpe | 0.69 | 0.82 | Inferior en 0.13 |
-| Sortino | 0.92 | 1.16 | Inferior en 0.24 |
+| CAGR | 4.45% | 15.40% | Inferior |
+| Retorno acumulado | 33.68% | 159.87% | Inferior |
+| Volatilidad | 6.29% | 20.10% | 13.81 pp menor |
+| Sharpe | 0.72 | 0.81 | Inferior en 0.09 |
+| Sortino | 0.97 | 1.15 | Inferior en 0.18 |
 | Maximum Drawdown | -10.98% | -33.72% | Mejora de 22.74 pp |
-| Calmar | 0.38 | 0.46 | Inferior |
+| Calmar | 0.41 | 0.46 | Inferior |
 | Recuperación máxima | 571 sesiones | 488 sesiones | 83 sesiones más lenta |
 
-La baja exposición promedio —42.70%— explica parte de la reducción de volatilidad y retorno. Aún no puede afirmarse que la selección de fechas añada valor frente a una reducción estática comparable de exposición; esa comparación debe incorporarse en la siguiente iteración.
+La baja exposición promedio —43.27%— explica parte de la reducción de volatilidad y retorno. Aún no puede afirmarse que la selección de fechas añada valor frente a una reducción estática comparable de exposición; esa comparación debe incorporarse en la siguiente iteración.
 
 ## Caveats obligatorios
 
@@ -66,9 +72,8 @@ La baja exposición promedio —42.70%— explica parte de la reducción de vola
 Antes de agregar TFT, comparar la baseline contra:
 
 - Buy & Hold escalado a igual volatilidad;
-- cartera SPY/cash con exposición fija de 42.70%;
+- cartera SPY/cash con exposición fija de 43.27%;
 - media móvil simple con la misma estructura de costos;
 - reglas sin cada modelo mediante ablación.
 
 Solo después conviene optimizar pesos dentro de un nested walk-forward y volver a reservar un período final completamente intocado.
-

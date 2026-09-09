@@ -30,11 +30,50 @@ def select_range(frame: pd.DataFrame, range_key: str) -> pd.DataFrame:
     return frame.loc[frame.index >= _range_start(frame.index, range_key)]
 
 
-def market_history_figure(frame: pd.DataFrame, range_key: str, log_scale: bool = False) -> go.Figure:
+def _adjusted_ohlc(data: pd.DataFrame) -> pd.DataFrame:
+    required = {"Open", "High", "Low", "Close", "price"}
+    if not required.issubset(data.columns):
+        return pd.DataFrame(index=data.index)
+    factor = data["price"].div(data["Close"].replace(0, np.nan))
+    adjusted = pd.DataFrame(index=data.index)
+    for column in ("Open", "High", "Low", "Close"):
+        adjusted[column] = data[column].mul(factor)
+    return adjusted.replace([np.inf, -np.inf], np.nan)
+
+
+def market_history_figure(
+    frame: pd.DataFrame,
+    range_key: str,
+    log_scale: bool = False,
+    price_view: str = "Línea",
+) -> go.Figure:
     data = select_range(frame, range_key)
     figure = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.76, 0.24], vertical_spacing=0.07)
+    use_candles = price_view == "Velas"
+    adjusted = _adjusted_ohlc(data) if use_candles else pd.DataFrame(index=data.index)
+    if use_candles and not adjusted.empty:
+        figure.add_trace(
+            go.Candlestick(
+                x=adjusted.index,
+                open=adjusted["Open"],
+                high=adjusted["High"],
+                low=adjusted["Low"],
+                close=adjusted["Close"],
+                name="SPY ajustado",
+                increasing={"line": {"color": BLUE, "width": 1}, "fillcolor": BLUE_LIGHT},
+                decreasing={"line": {"color": ORANGE, "width": 1}, "fillcolor": "#F7C9B4"},
+                whiskerwidth=0.35,
+            ),
+            row=1,
+            col=1,
+        )
+    else:
+        figure.add_trace(
+            go.Scatter(x=data.index, y=data["price"], name="SPY ajustado", mode="lines", line={"color": INK, "width": 2.4}),
+            row=1,
+            col=1,
+        )
     series = [
-        ("price", "SPY ajustado", INK, 2.4, None),
         ("ma_20", "MA20", BLUE_LIGHT, 1.2, "dot"),
         ("ma_50", "MA50", BLUE, 1.3, "dash"),
         ("ma_200", "MA200", MUTED, 1.4, "dashdot"),
@@ -64,6 +103,7 @@ def market_history_figure(frame: pd.DataFrame, range_key: str, log_scale: bool =
     figure.update_yaxes(**axis("USD"), type="log" if log_scale else "linear", row=1, col=1)
     figure.update_yaxes(**axis("Drawdown", percent=True), row=2, col=1)
     figure.update_xaxes(showgrid=False, linecolor="#CBD1DB", row=2, col=1)
+    figure.update_xaxes(rangeslider_visible=False, row=1, col=1)
     return figure
 
 

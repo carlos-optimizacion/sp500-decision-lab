@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sp500-decision-lab"
-version = "0.2.0"
+version = "0.3.0"
 description = "Laboratorio educativo de decisión cuantitativa para el S&P 500"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,7 +17,7 @@ pythonpath = ["."]
 
 [tool.coverage.run]
 branch = true
-source = ["data", "models", "decision", "backtesting"]
+source = ["data", "models", "decision", "forecasting", "backtesting"]
 
 [tool.setuptools]
 packages = [
@@ -25,6 +25,5 @@ packages = [
   "app", "app.pages", "app.components", "app.charts",
   "data", "data.providers", "data.ingestion", "data.validation", "data.features",
   "models", "models.kalman", "models.hmm", "models.egarch", "models.change_point",
-  "decision", "backtesting", "learning"
+  "decision", "forecasting", "backtesting", "learning"
 ]
-

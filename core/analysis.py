@@ -18,6 +18,7 @@ from data.features import build_features
 from data.ingestion.pipeline import load_or_acquire
 from decision.engine import explain_latest_signal
 from decision.horizons import conditional_historical_outcomes
+from forecasting import ForecastResult, build_next_session_forecast
 
 
 @dataclass
@@ -29,13 +30,16 @@ class AnalysisBundle:
     backtest: BacktestResult
     fold_metrics: pd.DataFrame
     horizons: pd.DataFrame
+    forecast_history: pd.DataFrame
+    forecast: dict[str, Any]
+    forecast_validation: dict[str, Any]
     manifest: dict[str, Any]
     experiment: dict[str, Any]
 
 
 def _source_fingerprint(paths: ProjectPaths) -> str:
     digest = hashlib.sha256()
-    roots = [paths.root / name for name in ("core", "models", "decision", "backtesting", "data", "config")]
+    roots = [paths.root / name for name in ("core", "models", "decision", "forecasting", "backtesting", "data", "config")]
     files = sorted(file for root in roots for file in root.rglob("*") if file.suffix in {".py", ".yaml"})
     for file in files:
         digest.update(str(file.relative_to(paths.root)).encode("utf-8"))
@@ -64,6 +68,7 @@ def build_analysis(refresh: bool = False, settings: dict[str, Any] | None = None
         int(settings["backtest"]["annual_periods"]),
     )
     horizons = conditional_historical_outcomes(walk_forward.decisions)
+    forecast: ForecastResult = build_next_session_forecast(features, walk_forward.model_frame, settings)
 
     write_frame(walk_forward.model_frame, paths.processed / "oos_model_frame")
     write_frame(walk_forward.decisions, paths.processed / "oos_decisions")
@@ -71,6 +76,11 @@ def build_analysis(refresh: bool = False, settings: dict[str, Any] | None = None
     write_frame(backtest.daily, paths.processed / "backtest_daily")
     write_frame(backtest.annual_returns, paths.processed / "annual_returns")
     write_frame(horizons, paths.processed / "conditional_horizons")
+    write_frame(forecast.history, paths.processed / "forecast_oos")
+    write_json(
+        {"current": forecast.current, "validation": forecast.validation},
+        paths.processed / "forecast_latest.json",
+    )
     write_parquet(market, paths.parquet / "market_daily.parquet")
     write_parquet(features, paths.parquet / "feature_store.parquet")
     write_parquet(walk_forward.decisions, paths.parquet / "oos_decisions.parquet")
@@ -111,8 +121,10 @@ def build_analysis(refresh: bool = False, settings: dict[str, Any] | None = None
         "explanation": explain_latest_signal(walk_forward.decisions),
         "strategy_metrics": backtest.strategy_metrics,
         "benchmark_metrics": backtest.benchmark_metrics,
+        "next_session_forecast": forecast.current,
+        "forecast_validation": forecast.validation,
         "walk_forward_periods": [int(value) for value in walk_forward.fold_metrics.index],
-        "lookahead_control": "Señal t aplicada a retorno t+1; HMM/EGARCH ajustados solo con train anterior al año de test.",
+        "lookahead_control": "Señal y pronóstico originados en t; retorno t+1 reservado como resultado. HMM, EGARCH y pronóstico ajustados solo con historia anterior al período de test.",
     }
     write_json(experiment, paths.processed / "experiment_latest.json")
     write_json(experiment, paths.processed / "experiments" / f"{experiment_id}.json")
@@ -124,6 +136,7 @@ def build_analysis(refresh: bool = False, settings: dict[str, Any] | None = None
             "oos_decisions": walk_forward.decisions,
             "backtest_daily": backtest.daily,
             "walk_forward_metrics": walk_forward.fold_metrics,
+            "forecast_oos": forecast.history,
         },
         paths.duckdb,
     )
@@ -135,6 +148,9 @@ def build_analysis(refresh: bool = False, settings: dict[str, Any] | None = None
         backtest,
         walk_forward.fold_metrics,
         horizons,
+        forecast.history,
+        forecast.current,
+        forecast.validation,
         manifest,
         experiment,
     )
@@ -150,6 +166,8 @@ def load_snapshot() -> AnalysisBundle:
         paths.processed / "backtest_daily.csv",
         paths.processed / "walk_forward_metrics.csv",
         paths.processed / "annual_returns.csv",
+        paths.processed / "forecast_oos.csv",
+        paths.processed / "forecast_latest.json",
         paths.processed / "experiment_latest.json",
         paths.processed / "data_manifest.json",
     ]
@@ -170,5 +188,21 @@ def load_snapshot() -> AnalysisBundle:
         horizons = read_frame(paths.processed / "conditional_horizons")
     except FileNotFoundError:
         horizons = conditional_historical_outcomes(decisions)
+    forecast_history = read_frame(paths.processed / "forecast_oos")
+    with (paths.processed / "forecast_latest.json").open("r", encoding="utf-8") as handle:
+        forecast_document = json.load(handle)
     backtest = BacktestResult(daily, experiment["strategy_metrics"], experiment["benchmark_metrics"], annual)
-    return AnalysisBundle(market, features, model_frame, decisions, backtest, fold_metrics, horizons, manifest, experiment)
+    return AnalysisBundle(
+        market,
+        features,
+        model_frame,
+        decisions,
+        backtest,
+        fold_metrics,
+        horizons,
+        forecast_history,
+        forecast_document["current"],
+        forecast_document["validation"],
+        manifest,
+        experiment,
+    )

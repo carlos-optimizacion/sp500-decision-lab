@@ -11,6 +11,15 @@
 - Dashboard, ablación, aprendizaje y trazabilidad.
 - Pruebas automatizadas y snapshot real.
 
+## Completado en MVP 3
+
+- Pronóstico probabilístico para la próxima sesión con validación temporal.
+- Comparación contra referencias direccional y de retorno cero.
+- Intervalo predictivo del 80% con volatilidad EGARCH `t+1`.
+- Estado explícito cuando no se demuestra ventaja predictiva.
+- Zoom y desplazamiento en series temporales.
+- Velas OHLC ajustadas como vista opcional.
+
 ## Siguiente iteración recomendada
 
 1. Añadir benchmarks de exposición y volatilidad equivalentes.
@@ -20,6 +29,7 @@
 5. Evaluar UKF contra Kalman lineal; mantenerlo solo si mejora estabilidad o resultado fuera de muestra.
 6. Medir calibración y persistencia del HMM entre folds.
 7. Incorporar pruebas de estrés de costos, retraso de ejecución y datos faltantes.
+8. Evaluar calibración, estabilidad y modelos alternativos para el pronóstico diario; conservarlos solo si superan las referencias fuera de muestra.
 
 ## Después de una baseline sólida
 

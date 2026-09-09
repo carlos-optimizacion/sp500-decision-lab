@@ -17,7 +17,7 @@ def render(bundle: AnalysisBundle) -> None:
     )
     concept = st.radio(
         "Elige un concepto",
-        ["Retorno", "Volatilidad", "Drawdown", "VIX", "Kalman", "Régimen", "Opportunity Score"],
+        ["Retorno", "Volatilidad", "Drawdown", "VIX", "Kalman", "Régimen", "Opportunity Score", "Pronóstico t+1"],
         horizontal=True,
     )
 
@@ -55,11 +55,27 @@ def render(bundle: AnalysisBundle) -> None:
         st.write(
             f"El estado dominante es {latest['regime_label']}. Las probabilidades son Bull {latest['regime_Bull']:.1%}, Neutral {latest['regime_Neutral']:.1%}, Correction {latest['regime_Correction']:.1%} y Stress {latest['regime_Stress']:.1%}. Conservar la distribución muestra cuándo la clasificación es ambigua."
         )
-    else:
+    elif concept == "Opportunity Score":
         st.subheader("Opportunity Score: síntesis con guardas")
         st.latex(r"OS=\sum_i w_i s_i,\quad OS\in[0,100]")
         st.write(
             f"El Opportunity Score actual es {latest['opportunity_score']:.1f}; Risk Score {latest['risk_score']:.1f} y Confidence Score {latest['confidence_score']:.1f}. Si la confianza cae por debajo de 60, el motor impide una condición fuerte aunque Opportunity sea alto."
+        )
+    else:
+        forecast = bundle.forecast
+        validation = bundle.forecast_validation
+        st.subheader("Pronóstico t+1: una distribución, no un precio seguro")
+        st.latex(r"r_{t+1}=\mu_{t+1}+\sigma_{t+1}\varepsilon_{t+1}")
+        st.write(
+            f"Para la próxima sesión, el modelo estima una probabilidad positiva de {forecast['probability_positive']:.1%}, "
+            f"un retorno central de {forecast['expected_return']:+.2%} y un rango del 80% entre "
+            f"US$ {forecast['lower_price']:,.2f} y US$ {forecast['upper_price']:,.2f}. "
+            f"La validación usa {validation['observations']:,} pronósticos fuera de muestra y su estado actual es: "
+            f"{validation['status']}."
+        )
+        st.write(
+            "El modelo direccional y el retorno esperado se estiman con variables conocidas al cierre. EGARCH aporta la "
+            "volatilidad de la sesión siguiente. El retorno real de t+1 se utiliza después, únicamente para evaluar el pronóstico."
         )
 
     st.divider()

@@ -58,3 +58,14 @@
 | `strategy_return` | decimal | Exposición × retorno − costo |
 | `strategy_equity` | índice base 1 | Curva acumulada |
 
+## Pronóstico de una sesión
+
+| Campo | Unidad | Descripción |
+|---|---:|---|
+| `probability_positive` | 0–1 | Probabilidad estimada de retorno positivo en `t+1` |
+| `expected_return` | decimal | Retorno central estimado para la próxima sesión |
+| `baseline_probability` | 0–1 | Frecuencia positiva observada en el train del fold |
+| `volatility_annualized` | decimal anual | Volatilidad EGARCH prevista para `t+1` |
+| `lower_return`, `upper_return` | decimal | Límites del intervalo predictivo del 80% |
+| `realized_return` | decimal | Resultado observado posteriormente; solo se usa para validación |
+| `outcome_date` | fecha | Sesión cuyo retorno permite evaluar el pronóstico originado en `t` |
